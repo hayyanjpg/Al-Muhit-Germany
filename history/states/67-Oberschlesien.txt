@@ -1,0 +1,40 @@
+# Al-Muhit Germany: manpower x10, resource sesuai target
+state = {
+	id = 67
+	name = "STATE_67"
+	manpower = 14025910
+	resources = {
+		steel = 45 #was 11 #was: 11 was 19 # was: 60
+		aluminium = 29 # was: 20
+		coal = 89 # initial distribution / 660 total
+			rubber = 7
+}
+	
+	state_category = city
+
+	history = {
+
+		owner = GER
+		add_core_of = GER
+		add_core_of = SIL
+		add_core_of = PRE
+
+		victory_points = {
+			11467 5 # Gleiwitz
+		}
+		victory_points = {
+			9511 3 # Oppeln
+		}
+		
+		buildings = {
+			infrastructure = 3
+		}
+		
+	}
+
+	provinces = {
+		479 6512 9457 9511 11467 
+	}
+
+	local_supplies = 4.0 
+}
