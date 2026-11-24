@@ -1,8 +1,8 @@
-# Al-Muhit Germany: manpower x10, resource sesuai target
+# Al-Muhit Germany: manpower x5, resource sesuai target
 state = {
 	id = 52
 	name = "STATE_52"
-	manpower = 26794130
+	manpower = 13397065
 	resources = {
 		aluminium = 92 # was: 30
 			rubber = 8

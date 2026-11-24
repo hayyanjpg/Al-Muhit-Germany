@@ -1,8 +1,8 @@
-# Al-Muhit Germany: manpower x10, resource sesuai target
+# Al-Muhit Germany: manpower x5, resource sesuai target
 state = {
 	id = 64
 	name = "STATE_64"
-	manpower = 72650290
+	manpower = 36325145
 	buildings_max_level_factor = 1
 
 	state_category = megalopolis

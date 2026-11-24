@@ -8,30 +8,30 @@ MOD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARENT = os.path.dirname(MOD)
 
 MANPOWER_EXPECT = {
-    "42-Rhineland.txt": 30277390,
-    "5-Germany.txt": 12381080,
-    "50-Baden.txt": 30768540,
-    "51-Moselland.txt": 61447430,
-    "52-Wuttemberg.txt": 26794130,
-    "53-Oberbayern.txt": 14533650,
-    "54-Bayreuth.txt": 25081590,
-    "55-Nassau.txt": 37982350,
-    "56-Weser-Ems.txt": 20584670,
-    "57-Westfalen.txt": 51093330,
-    "58-Schleswig - Holstein.txt": 30956300,
-    "59-Ost - Hannover.txt": 24382860,
-    "60-Sud-Hannover.txt": 30052140,
-    "61-Mecklenburg.txt": 8363530,
-    "62-Pommern.txt": 10062210,
-    "63-WestPrussen.txt": 11244170,
-    "64-Brandenburg.txt": 72650290,
-    "65-Sachsen.txt": 55925760,
-    "66-Niederschlesien.txt": 30527260,
-    "67-Oberschlesien.txt": 14025910,
-    "68-Wartheland.txt": 12508400,
-    "763-Konigsberg.txt": 21402340,
-    "909-South Schleswig.txt": 1525200,
-    "978 - Actual Baden.txt": 20568540,
+    "42-Rhineland.txt": 15138695,
+    "5-Germany.txt": 6190540,
+    "50-Baden.txt": 15384270,
+    "51-Moselland.txt": 30723715,
+    "52-Wuttemberg.txt": 13397065,
+    "53-Oberbayern.txt": 7266825,
+    "54-Bayreuth.txt": 12540795,
+    "55-Nassau.txt": 18991175,
+    "56-Weser-Ems.txt": 10292335,
+    "57-Westfalen.txt": 25546665,
+    "58-Schleswig - Holstein.txt": 15478150,
+    "59-Ost - Hannover.txt": 12191430,
+    "60-Sud-Hannover.txt": 15026070,
+    "61-Mecklenburg.txt": 4181765,
+    "62-Pommern.txt": 5031105,
+    "63-WestPrussen.txt": 5622085,
+    "64-Brandenburg.txt": 36325145,
+    "65-Sachsen.txt": 27962880,
+    "66-Niederschlesien.txt": 15263630,
+    "67-Oberschlesien.txt": 7012955,
+    "68-Wartheland.txt": 6254200,
+    "763-Konigsberg.txt": 10701170,
+    "909-South Schleswig.txt": 762600,
+    "978 - Actual Baden.txt": 10284270,
 }
 
 RESOURCE_EXPECT = {
@@ -64,13 +64,22 @@ RESOURCE_EXPECT = {
     "978 - Actual Baden.txt": {"rubber": 7, "aluminium": 29},
 }
 
-# Dockyard hasil +6 per state (urutan mengikuti blok di file).
+# Dockyard sengaja sama dengan vanilla (total awal 10).
 DOCK_EXPECT = {
-    "56-Weser-Ems.txt": [8, 9],
-    "58-Schleswig - Holstein.txt": [12, 13],
-    "59-Ost - Hannover.txt": [8, 9],
-    "63-WestPrussen.txt": [6],
-    "763-Konigsberg.txt": [6],
+    "56-Weser-Ems.txt": [2, 3],
+    "58-Schleswig - Holstein.txt": [6, 7],
+    "59-Ost - Hannover.txt": [2, 3],
+    "63-WestPrussen.txt": [],
+    "763-Konigsberg.txt": [],
+}
+
+# Civilian = nilai vanilla + 8 per mega state (urutan mengikuti blok di file).
+CIV_EXPECT = {
+    "56-Weser-Ems.txt": [10, 12],
+    "58-Schleswig - Holstein.txt": [8],
+    "59-Ost - Hannover.txt": [9, 13],
+    "63-WestPrussen.txt": [9],
+    "763-Konigsberg.txt": [10],
 }
 MEGA_STATES = list(DOCK_EXPECT)
 RESOURCE_TOTALS = {
@@ -120,15 +129,29 @@ for fn, mp_expect in MANPOWER_EXPECT.items():
         check(got_dock == DOCK_EXPECT[fn],
               "%s: dockyard %s (harap %s)" %
               (fn, got_dock, DOCK_EXPECT[fn]))
+        got_civ = [int(x) for x in re.findall(r"industrial_complex\s*=\s*(\d+)",
+                                              txt)]
+        check(got_civ == CIV_EXPECT[fn],
+              "%s: civilian %s (harap %s)" %
+              (fn, got_civ, CIV_EXPECT[fn]))
 
 for k, v in RESOURCE_TOTALS.items():
     check(resource_sum[k] == v,
           "total %s = %d (harap %d)" % (k, resource_sum[k], v))
 
-dock_start = sum(DOCK_EXPECT[fn][0] for fn in MEGA_STATES)
-check(dock_start == 40, "dockyard awal di 5 mega state = %d (harap 40)" % dock_start)
-check(dock_start - 10 == 30,
-      "dockyard tambahan = %d (harap 30)" % (dock_start - 10))
+dock_start = sum(DOCK_EXPECT[fn][0] if DOCK_EXPECT[fn] else 0
+                 for fn in MEGA_STATES)
+check(dock_start == 10,
+      "dockyard awal di 5 mega state = %d (harap 10)" % dock_start)
+VANILLA_START_CIV = {
+    "56-Weser-Ems.txt": 2, "58-Schleswig - Holstein.txt": 0,
+    "59-Ost - Hannover.txt": 1, "63-WestPrussen.txt": 1,
+    "763-Konigsberg.txt": 2,
+}
+civ_added = sum(CIV_EXPECT[fn][0] - VANILLA_START_CIV[fn]
+                for fn in MEGA_STATES)
+check(civ_added == 40,
+      "civilian tambahan awal = %d (harap 40)" % civ_added)
 
 # --- country history: 200 tech dari Al-Muhit ---
 hist = os.path.join(MOD, "history", "countries", "GER - Germany.txt")
@@ -168,5 +191,6 @@ if errors:
     for e in errors:
         print(" -", e)
     sys.exit(1)
-print("VALIDASI OK: 24 state GER (manpower x10, resource sesuai target), "
-      "5 megalopolis +30 dockyard, 200 tech Al-Muhit, tanpa override map/.")
+print("VALIDASI OK: 24 state GER (manpower x5, resource sesuai target), "
+      "5 megalopolis +40 civilian, dockyard 10, 200 tech Al-Muhit, "
+      "tanpa override map/.")

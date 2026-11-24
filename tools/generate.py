@@ -3,9 +3,9 @@
 
 Isi:
   - 200 tech dari mod Al-Muhit (sumber: save 1941.12.1) dipakai Jerman.
-  - 24 state GER tahun 1936: manpower x10, resource menurut target nasional.
-  - 5 state pesisir dijadikan megalopolis dan masing-masing +6 dockyard
-    (= +30 dockyard dari awal, tersebar di 5 state).
+  - 24 state GER tahun 1936: manpower x5, resource menurut target nasional.
+  - 5 state pesisir dijadikan megalopolis dan masing-masing +8 civilian
+    factory (= +40 civilian dari awal). Dockyard tetap 10 seperti vanilla.
   - Tanpa override map/ (tidak ada risiko 'Failed to load the map').
 
 Usage:  python tools/generate.py
@@ -17,7 +17,7 @@ GAME = r"D:\SteamLibrary\steamapps\common\Hearts of Iron IV"
 MOD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOURCE_MOD = os.path.join(os.path.dirname(MOD), "Al-Muhit")
 
-MANPOWER_MULTIPLIER = 10
+MANPOWER_MULTIPLIER = 5
 RESOURCE_KEYS = ("steel", "tungsten", "rubber", "chromium", "coal",
                  "aluminium", "oil")
 
@@ -69,7 +69,7 @@ MEGA_STATES = [
     "63-WestPrussen.txt",
     "763-Konigsberg.txt",
 ]
-EXTRA_DOCKYARDS_PER_STATE = 6  # 5 x 6 = 30 dockyard tambahan
+EXTRA_CIVILIAN_PER_STATE = 8  # 5 x 8 = 40 civilian factory tambahan
 
 
 def w(rel, text):
@@ -186,13 +186,13 @@ def apply_resources(txt, plan):
     return txt
 
 
-def add_dockyards(txt, fn, extra):
-    """Tambah `extra` dockyard ke semua blok buildings (termasuk dated)."""
-    txt, n = re.subn(r"(dockyard[ \t]*=[ \t]*)(\d+)",
+def add_civilian(txt, fn, extra):
+    """Tambah `extra` civilian factory ke semua blok buildings (termasuk dated)."""
+    txt, n = re.subn(r"(industrial_complex[ \t]*=[ \t]*)(\d+)",
                      lambda m: m.group(1) + str(int(m.group(2)) + extra),
                      txt)
     if n == 0:
-        ins = "\t\t\tdockyard = %d\n" % extra
+        ins = "\t\t\tindustrial_complex = %d\n" % extra
         txt, k = re.subn(r"(buildings\s*=\s*\{\r?\n)",
                          lambda m: m.group(1) + ins, txt, count=1)
         if k == 0:
@@ -210,14 +210,14 @@ def write_states(plans):
         txt = multiply_manpower(txt, fn)
         txt = apply_resources(txt, plans[fn])
 
-        tag = "manpower x10, resource sesuai target"
+        tag = "manpower x5, resource sesuai target"
         if fn in MEGA_STATES:
             txt, n = re.subn(r"state_category\s*=\s*\w+",
                              "state_category = megalopolis", txt, count=1)
             if n == 0:
                 raise RuntimeError("state_category hilang di %s" % fn)
-            txt = add_dockyards(txt, fn, EXTRA_DOCKYARDS_PER_STATE)
-            tag += ", megalopolis, +%d dockyard" % EXTRA_DOCKYARDS_PER_STATE
+            txt = add_civilian(txt, fn, EXTRA_CIVILIAN_PER_STATE)
+            tag += ", megalopolis, +%d civilian" % EXTRA_CIVILIAN_PER_STATE
 
         txt = "# Al-Muhit Germany: %s\n" % tag + txt
         w("history/states/" + fn, txt)
@@ -260,14 +260,15 @@ Mod HOI4 1.20.x, **terpisah** dari mod `Al-Muhit`. Tidak ada override `map/`.
 ## Isi mod
 - 200 tech dari mod Al-Muhit (hasil ekstraksi save 1941.12.1) dipakai Jerman
   sejak 1936. Kecepatan riset dan slot riset tetap seperti vanilla.
-- 24 state yang di-owner GER pada 1936: manpower **x10** (655.139.070 total).
+- 24 state yang di-owner GER pada 1936: manpower **x5** (327.569.535 total).
 - Resource nasional GER di-set ke target: steel 900, coal 530, tungsten 240,
   chromium 320, oil 130, aluminium 430, rubber 180. Distribusi per state
   mengikuti pola resource vanilla, dengan sisa pembulatan ke state terbesar.
 - 5 state pesisir jadi **megalopolis**: Weser-Ems, Schleswig-Holstein,
   Ost-Hannover, WestPrussen, Konigsberg.
-- **+30 dockyard dari awal**, dibagi rata 6 per state di kelima state itu.
-  Kenaikan juga mengikuti blok `1939.1.1` supaya tidak turun di tahun itu.
+- **+40 civilian factory dari awal**, dibagi rata 8 per state di kelima
+  state itu (termasuk blok `1939.1.1`). Dockyard sengaja tidak ditambah:
+  total awal tetap 10 seperti vanilla.
 - OOB, pemimpin, warna, bendera, dan fokus Jerman tetap vanilla.
 
 ## Cara pakai
@@ -290,12 +291,13 @@ def main():
                            open(os.path.join(MOD, "history", "states", fn),
                                 encoding="utf-8-sig", errors="replace").read()
                            ).group(1)) for fn in GER_STATES)
-    print("OK: %d state GER, manpower x10 = %d" % (n, mp))
+    print("OK: %d state GER, manpower x5 = %d" % (n, mp))
     print("RESOURCE   : %s" % ", ".join("%s %d" % (k, v)
                                        for k, v in RESOURCE_TOTALS.items()))
-    print("MEGALOPOLIS: %d state, +%d dockyard/state = +%d dockyard" %
-          (len(MEGA_STATES), EXTRA_DOCKYARDS_PER_STATE,
-           len(MEGA_STATES) * EXTRA_DOCKYARDS_PER_STATE))
+    print("MEGALOPOLIS: %d state, +%d civilian/state = +%d civilian" %
+          (len(MEGA_STATES), EXTRA_CIVILIAN_PER_STATE,
+           len(MEGA_STATES) * EXTRA_CIVILIAN_PER_STATE))
+    print("DOCKYARD   : 10 (vanilla, tanpa bonus)")
     print("TECH       : 200 tech disalin dari mod Al-Muhit")
     print("MOD:", MOD)
 

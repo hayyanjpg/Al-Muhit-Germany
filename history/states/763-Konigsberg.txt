@@ -1,8 +1,8 @@
-# Al-Muhit Germany: manpower x10, resource sesuai target, megalopolis, +6 dockyard
+# Al-Muhit Germany: manpower x5, resource sesuai target, megalopolis, +8 civilian
 state = {
 	id = 763
 	name = "STATE_763"
-	manpower = 21402340
+	manpower = 10701170
 	state_category = megalopolis
 	resources = {
 		rubber = 7
@@ -19,9 +19,8 @@ state = {
 		}
 
 		buildings = {
-			dockyard = 6
 			infrastructure = 3 #was: 6
-			industrial_complex = 2
+			industrial_complex = 10
 			anti_air_building = 2
 			6332 = {
 				bunker = 1
